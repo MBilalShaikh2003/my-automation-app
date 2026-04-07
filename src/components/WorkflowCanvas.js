@@ -82,6 +82,42 @@ function CanvasInner() {
     [setEdges]
   );
 
+//handle run workflow
+const handleRunWorkflow = async () => {
+  console.log("🚀 Starting Workflow Execution...");
+  
+  // 1. Find the starting node (the one with type 'input')
+  const startNode = nodes.find(n => n.type === 'input');
+  
+  if (!startNode) {
+    alert("Please add a 'Trigger' node first!");
+    return;
+  }
+
+  // 2. Simple execution queue
+  let currentNode = startNode;
+  let workflowActive = true;
+
+  while (workflowActive) {
+    console.log(`Executing node: ${currentNode.data.label}`);
+    
+    // Simulate AI or API work
+    await new Promise(resolve => setTimeout(resolve, 1000)); 
+
+    // 3. Find the edge coming OUT of this node
+    const edge = edges.find(e => e.source === currentNode.id);
+    
+    if (edge) {
+      // Move to the target node
+      currentNode = nodes.find(n => n.id === edge.target);
+    } else {
+      workflowActive = false;
+      console.log("🏁 Workflow Finished!");
+      alert("Workflow executed successfully!");
+    }
+  }
+};
+
   const handleSave = async () => {
     const result = await saveWorkflow(nodes, edges, currentWorkflowId);
     if (result.success) {
@@ -116,6 +152,13 @@ function CanvasInner() {
           className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 shadow-lg font-medium transition-transform active:scale-95"
         >
           Save Workflow
+        </button>
+
+        <button
+          onClick={handleRunWorkflow}
+          className="bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700 shadow-lg font-medium transition-all flex items-center gap-2"
+        >
+          <span className="text-lg">▶</span> Run Workflow
         </button>
       </div>
 
